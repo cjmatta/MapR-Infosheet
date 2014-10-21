@@ -6,6 +6,7 @@
   <script src="http://fb.me/JSXTransformer-0.11.2.js"></script>
   <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
   <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 <title>Your new Cluster</title>
 <style type="text/css">
@@ -31,20 +32,11 @@
         <h3>Cluster information</h2>
       </div>
     </div>
+
     <div class="container">
       <div class="row">
         <div class="col-md-9" id="content" role="main"></div>
-        <div class="col-md-3">
-          <!-- replace with react component -->
-          <div class="sidenav hidden-print hidden-xs hidden-sm affix">
-            <ul class="nav">
-              <li>CLDB</li>
-              <li>Zookeeper</li>
-              <li>NFS</li>
-              <li>Jobtracker</li>
-              <li>TaskTracker</li>
-            </ul>
-          </div>
+        <div class="col-md-3" id="sidenav">
         </div>
       </div>
       <div class="col-md-9" id="debug"></div>
@@ -90,10 +82,38 @@
         }
       });
 
+      var Navigation = React.createClass({
+        render: function () {
+          var list_items = this.props.data.map(function (category, index){
+            var id_name = "nav-" + category;
+            return (<li key={category} idName={id_name}>{category}</li>);
+          });
+
+          return (
+            <div idName="sidenav" className="sidenav hidden-print hidden-xs hidden-sm affix">
+              <ul className="nav">
+                {list_items}
+              </ul>
+            </div>
+          );
+        }
+      });
+
       console.log(host_vars);
+      var roles = _.chain(host_vars)
+                    .pluck('group_names')
+                    .flatten()
+                    .unique()
+                    .value();
+
       React.renderComponent(
         <HostTable data={host_vars} />,
         document.getElementById('content')
+      );
+
+      React.renderComponent(
+        <Navigation data={roles} />,
+        document.getElementById('sidenav')
       );
 
       var DebugPane = React.createClass({
