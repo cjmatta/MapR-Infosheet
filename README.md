@@ -1,12 +1,12 @@
 Role Name
 =========
 
-A role to generate an infosheet about a just-built cluster.
+An ansible role to generate an infosheet about a just-built MapR Hadoop cluster.
 
 Requirements
 ------------
 
-A running MapR cluster, with an inventory file or dynamic inventory script.
+A running MapR Hadoop cluster, with an inventory file or dynamic inventory script.
 
 Role Variables
 --------------
@@ -31,7 +31,7 @@ Including an example of how to use your role (for instance, with variables passe
 License
 -------
 
-BSD
+Apache
 
 Author Information
 ------------------
