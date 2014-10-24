@@ -1,0 +1,16 @@
+---
+# tasks file for mapr-infosheet
+- name: get ec2 facts
+  action: ec2_facts
+  register: ec2_facts
+  when: '"instance_id" in hostvars[inventory_hostname]'
+
+- name: copy infosheet.js
+  sudo: yes
+  run_once: true
+  local_action: template src=infosheet.js.j2 dest=/var/www/html/infosheet.js mode=0644
+
+- name: copy infosheet.html
+  sudo: yes
+  run_once: true
+  local_action: template src=infosheet.html.j2 dest=/var/www/html/infosheet.html mode=0644 
