@@ -100,11 +100,27 @@
       });
 
       console.log(host_vars);
+
       var roles = _.chain(host_vars)
                     .pluck('group_names')
                     .flatten()
                     .unique()
                     .value();
+
+      // sort the important roles first
+      var sorted_roles = _.sortBy(roles, function (r) {
+        var sort_index = _.sortedIndex({
+          'webserver': 1,
+          'cldb': 2,
+          'zookeepers': 3
+        }, r);
+
+        console.log([r, sort_index]);
+
+        return sort_index;
+      });
+
+      console.log(sorted_roles);
 
       React.renderComponent(
         <HostTable data={host_vars} />,
@@ -112,7 +128,7 @@
       );
 
       React.renderComponent(
-        <Navigation data={roles} />,
+        <Navigation data={sorted_roles} />,
         document.getElementById('sidenav')
       );
 
