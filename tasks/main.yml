@@ -23,5 +23,5 @@
 - name: copy infosheet v2
   sudo: yes
   run_once: true
-  local_action: template src=infosheetv2.html.j2 dest=/var/www/html/infosheet.html mode=0644 
+  local_action: template src=infosheetv2.html.j2 dest=/var/www/html/infosheet2.html mode=0644 
   
