@@ -10,7 +10,18 @@
   run_once: true
   local_action: template src=infosheet.js.j2 dest=/var/www/html/infosheet.js mode=0644
 
+- name: get maprcli service info
+  run_once: true
+  shell: maprcli node list -json -columns svc,csvc | tr -d '\n' | tr -d '\t'
+  register: maprcli_node_list
+
 - name: copy infosheet.html
   sudo: yes
   run_once: true
   local_action: template src=infosheet.html.j2 dest=/var/www/html/infosheet.html mode=0644 
+
+- name: copy infosheet v2
+  sudo: yes
+  run_once: true
+  local_action: template src=infosheetv2.html.j2 dest=/var/www/html/infosheet.html mode=0644 
+  
