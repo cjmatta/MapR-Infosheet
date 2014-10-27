@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Your Cluster</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <style>
+    <!-- <link href="navbar-fixed-top.css" rel="stylesheet"> -->
+	body {
+	  min-height: 2000px;
+	  padding-top: 70px;
+	}
+        .navbar {
+          background-color: #ba0021;
+        }
+
+        .navbar-default .navbar-brand {
+          color: white;
+        }
+
+        .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
+          color: white;
+          background-color: #8e0021;
+        }
+
+        .navbar-default .navbar-nav>li>a {
+          color: white;
+        }
+        td.nowrap {
+          min-width: 125px;
+        }
+    </style>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">MapR Cluster Infosheet</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+<!--
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+-->
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#"><img height="20" src="https://www.mapr.com/sites/default/files/mapr-logo-r.png"/></a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+     </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12" id="content" role="main"></div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel-group" id="accordion">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#hostvars">
+                    Host Variables
+                  </a>
+                </h4>
+              </div>
+              <div id="hostvars" class="panel-collapse collapse">
+                <div class="panel-body" id="debug"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.11.2/react.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.11.2/JSXTransformer.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/jsx">
+
+      /** @jsx React.DOM */
+      var host_vars = {{hostvars|to_json}};
+      var group_facts = {{groups|to_json}};
+      var service_info = {{maprcli_node_list.stdout|from_json|to_json}};
+
+      var HostTable = React.createClass({
+        render: function () {
+          var hostdata = this.props.data;
+          // omit the "all" group, since all nodes belong to it, and that's not interesting.
+          var groupdata = _.omit(this.props.groups, ["all"]);
+          var service_info = this.props.service_info;
+
+          var services = "";
+          var rows = Object.keys(hostdata).map(function (host, index) {
+            _.each(service_info.data, function(element, index, list) {
+              if (element.ip == host) {
+                services = element.configuredservice;
+              }
+            });
+            return (
+              <tr key={index}>
+                <td className="nowrap"><small>{hostdata[host].ansible_hostname}</small></td>
+                <td>{services.split(",").join(", ")}</td>
+                <td>{hostdata[host].group_names.join(", ")}</td>
+                <td>{hostdata[host].ansible_processor.length}</td>
+              </tr>
+            );
+          });
+
+          return (
+          <div idName="hosttable" className="table-responsive">
+            <h1>Host Data</h1>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Host</th>
+                  <th>MapR Services</th>
+                  <th>Ansible Groups</th>
+                  <th>Num CPU</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows}
+              </tbody>
+            </table>
+          </div>
+          );
+        }
+      });
+
+      React.renderComponent(
+        <HostTable data={host_vars} groups={group_facts} service_info={service_info} />,
+        document.getElementById('content')
+      );
+
+      var DebugPane = React.createClass({
+        render: function () {
+          return (
+            <div className="debugpane">
+              <pre>{JSON.stringify(this.props.data, undefined, 2)}</pre>
+            </div>
+          );
+        }
+      });
+
+      var DebugArea = React.createClass({
+        render: function () {
+          var panes = this.props.data.map(function (d){
+            return(<DebugPane title={d.title} data={d.data} />);
+          });
+
+          return(
+            <div className="debugarea">
+              {panes}
+            </div>
+          );
+        }
+      });
+
+      var debug_data = [
+          {title: "Host Variables", data: host_vars }
+      ];
+
+      React.renderComponent(
+       <DebugArea data={debug_data} />,
+        document.getElementById('debug')
+      );
+    </script>
+ 
+  </body>
+</html>
+
